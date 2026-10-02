@@ -24,6 +24,7 @@ def lookup_order_by_email(email: str) -> str:
             return {"order_id":oid, **order}
     return None
 
+
 @tool
 def search_product_catalog(query: str) -> str:
     """Search the AxiomCart product catalog using semantic search (RAG).
@@ -31,19 +32,18 @@ def search_product_catalog(query: str) -> str:
     Args:
         query: natural-language search, e.g. "wireless headphones under 5000"
     """
-
     logger.info("search_product_catalog query=%r",query)
     try:
-        docs = product_vectorstore.asimilarity_search(query,k=3)
+        docs = product_vectorstore.similarity_search(query,k=3)
         if not docs:
-            return "No product found matching your query."
-        results = "Found the following product"
-        for i, doc in enumerate(docs,i):
+            return "No products found matching your query."
+        results = "Found the following products:\n\n"
+        for i, doc in enumerate(docs,1):
             results+= f"Product {i}:\n{doc.page_content}\n\n"
         return results
     except Exception as exc:
         logger.exception("Catalog search failed")
-        return f"Error seaching catalog: {exc}"
+        return f"Error searching catalog: {exc}"
 
 @tool
 def get_order_status(identifier: str)-> str:

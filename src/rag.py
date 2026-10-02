@@ -1,7 +1,7 @@
 """
-RAG: Build a chroma DB vector store from the product catalog.
+RAG: Build a ChromaDB vector store from the product catalog.
 
-The Vector store is created once at import time and reused by the 
+The vector store is created once at import time and re-used by the
 search_product_catalog tool.
 """
 
@@ -13,8 +13,8 @@ from src.data import PRODUCT_CATALOG
 
 logger = get_logger("rag")
 
-def build_documents() -> list[Document]:
-    """Convert every catalog entry into a langchain Document"""
+def _build_documents() -> list[Document]:
+    """Convert every catalog entry into a LangChain Document."""
     docs: list[Document] = []
     for p in PRODUCT_CATALOG:
         content = (
@@ -31,27 +31,30 @@ def build_documents() -> list[Document]:
         docs.append(
             Document(
                 page_content=content,
-                metadata = {
-                    "id":p["id"],
-                    "name":p["name"],
-                    "brand":p["brand"],
-                    "category":p["category"],
+                metadata={
+                    "id": p["id"],
+                    "name": p["name"],
+                    "brand": p["brand"],
+                    "category": p["category"],
                     "price": p["price"],
-                    "rating":p["rating"]
-                }
+                    "rating": p["rating"],
+                },
             )
         )
-        return docs
+    return docs
+
 
 def build_vectorstore() -> Chroma:
-    """create an in-memory chroma collection from the product catalog"""
-    docs = build_documents()
+    """Create an in-memory ChromaDB collection from the product catalog."""
+    docs = _build_documents()
     store = Chroma.from_documents(
         documents=docs,
         embedding=embeddings,
-        collection_name="axiom-cart-products"
+        collection_name="axiomcart_products",
     )
-    logger.info("Vector store ready (%d products indexed)", len(docs))
+    logger.info("Vector store ready  (%d products indexed)", len(docs))
     return store
 
+
+# Module-level singleton so every importer shares the same store
 product_vectorstore = build_vectorstore()

@@ -121,3 +121,11 @@ class VoiceSpeaker:
             sd.wait()
         except Exception:
             logger.exception("Audio playback failed")
+    
+    def speak(self, text: str, play: bool = True) -> str:
+        """Synthesise *text* and optionally play it. Returns the file path."""
+        logger.info("Agent says: %s", text[:120])
+        path = self.synthesise(text)
+        if play and path:
+            self.play(path)
+        return path
